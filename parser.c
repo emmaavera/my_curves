@@ -34,6 +34,7 @@ The file follows the following format:
 	 scale: create a scale matrix, 
 	    then multiply the transform matrix by the scale matrix - 
 	    takes 3 arguments (sx, sy, sz)
+
 	 translate: create a translation matrix, 
 	    then multiply the transform matrix by the translation matrix - 
 	    takes 3 arguments (tx, ty, tz)
@@ -88,6 +89,7 @@ void parse_file ( char * filename,
   double x0, y0, z0, x1, y1, z1, x2, y2, x3, y3;
   double cx, cy, r;
   double x, y, z;
+  double theta;
   double step = 100;
 
   while ( fgets(line, 255, f) != NULL ) {
@@ -105,13 +107,13 @@ void parse_file ( char * filename,
 		add_circle(pm, cx, cy, r, step);
     }
 
-    else if (strcmp(line, "hermite") == 0) {
+    else if (strcmp(line, "hermite") == 0) { //not done
     	//takes 8 arguments (x0, y0, x1, y1, x2, y2, x3, y3)
 		sscanf(fgets(line, 100, f), "%lf %lf %lf %lf %lf %lf %lf %lf", &x0, &y0, &x1, &y1, &x2, &y2, &x3, &y3);
 
     }
 
-    else if (strcmp(line, "bezier") == 0) {
+    else if (strcmp(line, "bezier") == 0) {  //not done
 		sscanf(fgets(line, 100, f), "%lf %lf %lf %lf %lf %lf %lf %lf", &x0, &y0, &x1, &y1, &x2, &y2, &x3, &y3);
 
     }
@@ -128,22 +130,38 @@ void parse_file ( char * filename,
     }
 
     else if (strcmp(line, "translate") == 0) {
-
+		sscanf(fgets(line, 100, f), "%lf %lf %lf", &x, &y, &z);	    	
+		matrix *s  = new_matrix(4,4);
+    	s = makes_translate(x, y, z);
+    	matrix_mult(s, transform);
     }
     
     else if (strcmp(line, "xrotate") == 0) {
-
+    	sscanf(fgets(line, 100, f), "%lf", &theta);
+    	theta *= M_PI / 180;
+    	matrix *s  = new_matrix(4,4);
+    	s = make_rotX(theta);
+    	matrix_mult(s, transform);
     }
-    else if (strcmp(line, "yrotate") == 0) {
 
+    else if (strcmp(line, "yrotate") == 0) {
+    	sscanf(fgets(line, 100, f), "%lf", &theta);
+    	theta *= M_PI / 180;
+    	matrix *s  = new_matrix(4,4);
+    	s = make_rotY(theta);
+    	matrix_mult(s, transform);
     }
 
     else if (strcmp(line, "zrotate") == 0) {
-
+    	sscanf(fgets(line, 100, f), "%lf", &theta);
+    	theta *= M_PI / 180;
+    	matrix *s  = new_matrix(4,4);
+    	s = make_rotZ(theta);
+    	matrix_mult(s, transform);
     }
 
     else if (strcmp(line, "apply") == 0) {
-
+    	matrix_mult(transform, edge);
     }
 
     else if (strcmp(line, "display") == 0) {
