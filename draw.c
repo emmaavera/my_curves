@@ -63,6 +63,18 @@ void add_curve( struct matrix *points,
 		double x2, double y2, 
 		double x3, double y3, 
 		double step, int type ) {
+  if (type) { //Bezier (1)
+    //for x
+
+    //for y
+  
+  }
+  else { //Hermite (0)
+    //for x
+
+    //for y
+
+  }
 }
 
 /*======== void add_point() ==========
