@@ -74,7 +74,7 @@ void parse_file ( char * filename,
   char line[256];
 
   color c; 
-  c.red = MAX_COLOR;
+  c.red = 0;
   c.green = 0;
   c.blue = MAX_COLOR;
   
@@ -87,10 +87,27 @@ void parse_file ( char * filename,
   
 //Reading Variables
   double x0, y0, z0, x1, y1, z1, x2, y2, x3, y3;
+    x0 = 0;
+    y0 = 0;
+        z0 = 0;
+        x1 = 0;
+        y1 = 0;
+        z1 = 0;
+        x2 = 0;
+        y2 = 0;
+        x3 = 0;
+        y3 = 0;
   double cx, cy, r;
+        cx = 0;
+        cy = 0;
+        r = 0;
   double x, y, z;
+        x = 0;
+        y = 0;
+        z = 0;
   double theta;
-  double step = 100;
+        theta = 0;
+  double step = 500;
 
   while ( fgets(line, 255, f) != NULL ) {
 
@@ -98,78 +115,89 @@ void parse_file ( char * filename,
     printf(":%s:\n",line);  
 
     if (strcmp(line, "line") == 0 ) {
-    	sscanf(fgets(line, 100, f), "%lf %lf %lf %lf %lf %lf", &x0, &y0, &z0, &x1, &y1, &z1);
+    	sscanf(fgets(line, 255, f), "%lf %lf %lf %lf %lf %lf", &x0, &y0, &z0, &x1, &y1, &z1);
+    	//printf("Read in from line:\n");
+    	//printf("%lf %lf %lf %lf %lf %lf\n", x0, y0, z0, x1, y1, z1);
 		add_edge(pm, x0, y0, z0, x1, y1, z1);
+		//printf("a line has been added\n");
     }
 
     else if (strcmp(line, "circle") == 0) {
-		sscanf(fgets(line, 100, f), "%lf %lf %lf", &cx, &cy, &r);	
+		sscanf(fgets(line, 255, f), "%lf %lf %lf", &cx, &cy, &r);	
 		add_circle(pm, cx, cy, r, step);
     }
 
     else if (strcmp(line, "hermite") == 0) { //not done
     	//takes 8 arguments (x0, y0, x1, y1, x2, y2, x3, y3)
-		sscanf(fgets(line, 100, f), "%lf %lf %lf %lf %lf %lf %lf %lf", &x0, &y0, &x1, &y1, &x2, &y2, &x3, &y3);
-
+		sscanf(fgets(line, 255, f), "%lf %lf %lf %lf %lf %lf %lf %lf", &x0, &y0, &x1, &y1, &x2, &y2, &x3, &y3);
+		add_curve(pm, x0, y0, x1, y1, x2, y2, x3, y3, step, HERMITE_MODE);
     }
 
     else if (strcmp(line, "bezier") == 0) {  //not done
-		sscanf(fgets(line, 100, f), "%lf %lf %lf %lf %lf %lf %lf %lf", &x0, &y0, &x1, &y1, &x2, &y2, &x3, &y3);
-
+		sscanf(fgets(line, 255, f), "%lf %lf %lf %lf %lf %lf %lf %lf", &x0, &y0, &x1, &y1, &x2, &y2, &x3, &y3);
+		add_curve(pm, x0, y0, x1, y1, x2, y2, x3, y3, step, BEZIER_MODE);
     }
 
-    else if (strcmp(line, "indent") == 0) {
+    else if (strcmp(line, "ident") == 0) {
     	ident(transform);
+    	printf("IDENT MATRIX\n");
+    	print_matrix(transform);
     }
 
     else if (strcmp(line, "scale") == 0) {
-		sscanf(fgets(line, 100, f), "%lf %lf %lf", &x, &y, &z);	    	
-		matrix *s  = new_matrix(4,4);
-    	s = makes_scale(x, y, z);
+		sscanf(fgets(line, 255, f), "%lf %lf %lf", &x, &y, &z);
+		printf("Read in from scale:\n");
+    	printf("%lf %lf %lf\n", x, y, z);
+		struct matrix *s  = make_scale(x, y, z);
     	matrix_mult(s, transform);
+    	printf("TRANSFORM MATRIX\n");
+    	print_matrix(transform);
     }
 
     else if (strcmp(line, "translate") == 0) {
-		sscanf(fgets(line, 100, f), "%lf %lf %lf", &x, &y, &z);	    	
-		matrix *s  = new_matrix(4,4);
-    	s = makes_translate(x, y, z);
+		sscanf(fgets(line, 255, f), "%lf %lf %lf", &x, &y, &z);	    	
+		struct matrix *s  = make_translate(x, y, z);
+		print_matrix(s);
     	matrix_mult(s, transform);
+    	print_matrix(transform);
     }
     
     else if (strcmp(line, "xrotate") == 0) {
-    	sscanf(fgets(line, 100, f), "%lf", &theta);
+    	sscanf(fgets(line, 255, f), "%lf", &theta);
     	theta *= M_PI / 180;
-    	matrix *s  = new_matrix(4,4);
-    	s = make_rotX(theta);
+    	struct matrix *s = make_rotX(theta);
     	matrix_mult(s, transform);
     }
 
     else if (strcmp(line, "yrotate") == 0) {
-    	sscanf(fgets(line, 100, f), "%lf", &theta);
+    	sscanf(fgets(line, 255, f), "%lf", &theta);
     	theta *= M_PI / 180;
-    	matrix *s  = new_matrix(4,4);
-    	s = make_rotY(theta);
+    	struct matrix *s = make_rotY(theta);
     	matrix_mult(s, transform);
     }
 
     else if (strcmp(line, "zrotate") == 0) {
-    	sscanf(fgets(line, 100, f), "%lf", &theta);
+    	sscanf(fgets(line, 255, f), "%lf", &theta);
     	theta *= M_PI / 180;
-    	matrix *s  = new_matrix(4,4);
-    	s = make_rotZ(theta);
+    	struct matrix *s = make_rotZ(theta);
     	matrix_mult(s, transform);
     }
 
     else if (strcmp(line, "apply") == 0) {
-    	matrix_mult(transform, edge);
+    	matrix_mult(transform, pm);
+    	printf("PM\n");
+    	print_matrix(pm);
+    	draw_lines(pm, s, c);
     }
 
     else if (strcmp(line, "display") == 0) {
-    	display(s);
+      clear_screen(s);
+      draw_lines(pm,s,c);
+      display(s);
     }
 
    	else if (strcmp(line, "save") == 0) {
-   		save_extension(s, "image");
+   		save_extension(s, "pic_curves");
     }
 
     else if (strcmp(line, "quit") == 0) {

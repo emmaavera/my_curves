@@ -27,10 +27,10 @@ void add_circle( struct matrix * points,
     double x = cx + r*cos(t);
     double y = cy + r*sin(t);
     step = 2*M_PI / step;
-    for (int t; t < 2*M_PI, t+=step){}
+    for (; t < (2*M_PI); t+=step){
       add_edge(points, x, y, 0, cx + r*cos(t + step), cy+r*sin(t+step), 0);
-      double x = cx + r*cos(t+step);
-      double y = cy + r*sin(t+step);
+      x = cx + r*cos(t+step);
+      y = cy + r*sin(t+step);
     }
     
 }
@@ -56,26 +56,38 @@ to the matrix points
 03/16/12 15:24:25
 jdyrlandweaver
 ====================*/
-//***************************************INCOMPLETE
+
 void add_curve( struct matrix *points, 
 		double x0, double y0, 
 		double x1, double y1, 
 		double x2, double y2, 
 		double x3, double y3, 
 		double step, int type ) {
-  if (type) { //Bezier (1)
-    //for x
 
-    //for y
-  
+  struct matrix *x_val;
+  struct matrix *y_val;
+  double t;
+
+  if (type == HERMITE_MODE) { 
+    x_val = generate_curve_coefs(x0, x1, x2, x3, HERMITE_MODE);
+    y_val = generate_curve_coefs(y0, y1, y2, y3, HERMITE_MODE);
+
+    for(t = 0; t < 1; t += 1/step ){
+      add_edge(points, x_val->m[0][0]*t*t*t + x_val->m[1][0]*t*t + x_val->m[2][0]*t + x_val->m[3][0], y_val->m[0][0]*t*t*t + y_val->m[1][0]*t*t + y_val->m[2][0]*t + y_val->m[3][0], 0, x_val->m[0][0]*t*t*t + x_val->m[1][0]*t*t + x_val->m[2][0]*t + x_val->m[3][0], y_val->m[0][0]*t*t*t + y_val->m[1][0]*t*t + y_val->m[2][0]*t + y_val->m[3][0], 0);
+    }
+
   }
-  else { //Hermite (0)
-    //for x
+  else if (type == BEZIER_MODE){ 
+    x_val = generate_curve_coefs(x0, x1, x2, x3, BEZIER_MODE);
+    y_val = generate_curve_coefs(y0, y1, y2, y3, BEZIER_MODE);
 
-    //for y
+    for(t = 0; t < 1; t += 1/step) {
+      add_edge(points, x_val->m[0][0]*t*t*t + x_val->m[1][0]*t*t + x_val->m[2][0]*t + x_val->m[3][0], y_val->m[0][0]*t*t*t + y_val->m[1][0]*t*t + y_val->m[2][0]*t + y_val->m[3][0], 0, x_val->m[0][0]*t*t*t + x_val->m[1][0]*t*t + x_val->m[2][0]*t + x_val->m[3][0], y_val->m[0][0]*t*t*t + y_val->m[1][0]*t*t + y_val->m[2][0]*t + y_val->m[3][0], 0);
+    }
 
   }
 }
+
 
 /*======== void add_point() ==========
 Inputs:   struct matrix * points
