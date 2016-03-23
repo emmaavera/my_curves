@@ -122,26 +122,26 @@ void parse_file ( char * filename,
 		//printf("a line has been added\n");
     }
 
-    else if (strcmp(line, "circle") == 0) {
+    else if (strcmp(line, "circle") == 0  || strcmp(line, "c") == 0) {
 		sscanf(fgets(line, 255, f), "%lf %lf %lf", &cx, &cy, &r);	
 		add_circle(pm, cx, cy, r, step);
     }
 
-    else if (strcmp(line, "hermite") == 0) { //not done
+    else if (strcmp(line, "hermite") == 0  || strcmp(line, "h") == 0) { //not done
     	//takes 8 arguments (x0, y0, x1, y1, x2, y2, x3, y3)
 		sscanf(fgets(line, 255, f), "%lf %lf %lf %lf %lf %lf %lf %lf", &x0, &y0, &x1, &y1, &x2, &y2, &x3, &y3);
-		add_curve(pm, x0, y0, x1, y1, x2, y2, x3, y3, step, HERMITE_MODE);
+		add_curve(pm, x0, y0, x1-x0, y1-y0, x2, y2, x3-x2, y3-y2, step, HERMITE_MODE);
     }
 
-    else if (strcmp(line, "bezier") == 0) {  //not done
+    else if (strcmp(line, "bezier") == 0 || strcmp(line, "b") == 0) {  //not done
 		sscanf(fgets(line, 255, f), "%lf %lf %lf %lf %lf %lf %lf %lf", &x0, &y0, &x1, &y1, &x2, &y2, &x3, &y3);
 		add_curve(pm, x0, y0, x1, y1, x2, y2, x3, y3, step, BEZIER_MODE);
     }
 
     else if (strcmp(line, "ident") == 0) {
     	ident(transform);
-    	printf("IDENT MATRIX\n");
-    	print_matrix(transform);
+    	//printf("IDENT MATRIX\n");
+    	//print_matrix(transform);
     }
 
     else if (strcmp(line, "scale") == 0) {
@@ -150,8 +150,8 @@ void parse_file ( char * filename,
     	printf("%lf %lf %lf\n", x, y, z);
 		struct matrix *s  = make_scale(x, y, z);
     	matrix_mult(s, transform);
-    	printf("TRANSFORM MATRIX\n");
-    	print_matrix(transform);
+    	//printf("TRANSFORM MATRIX\n");
+    	//print_matrix(transform);
     }
 
     else if (strcmp(line, "translate") == 0) {
@@ -197,7 +197,7 @@ void parse_file ( char * filename,
     }
 
    	else if (strcmp(line, "save") == 0) {
-   		save_extension(s, "pic_curves");
+   		save_extension(s, "pic_curves.png");
     }
 
     else if (strcmp(line, "quit") == 0) {

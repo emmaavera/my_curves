@@ -57,6 +57,7 @@ to the matrix points
 jdyrlandweaver
 ====================*/
 
+
 void add_curve( struct matrix *points, 
 		double x0, double y0, 
 		double x1, double y1, 
@@ -69,25 +70,38 @@ void add_curve( struct matrix *points,
   double t;
 
   if (type == HERMITE_MODE) { 
-    x_val = generate_curve_coefs(x0, x1, x2, x3, HERMITE_MODE);
-    y_val = generate_curve_coefs(y0, y1, y2, y3, HERMITE_MODE);
-
-    for(t = 0; t < 1; t += 1/step ){
-      add_edge(points, x_val->m[0][0]*t*t*t + x_val->m[1][0]*t*t + x_val->m[2][0]*t + x_val->m[3][0], y_val->m[0][0]*t*t*t + y_val->m[1][0]*t*t + y_val->m[2][0]*t + y_val->m[3][0], 0, x_val->m[0][0]*t*t*t + x_val->m[1][0]*t*t + x_val->m[2][0]*t + x_val->m[3][0], y_val->m[0][0]*t*t*t + y_val->m[1][0]*t*t + y_val->m[2][0]*t + y_val->m[3][0], 0);
-    }
-
+    //x_val = generate_curve_coefs(x0, x2, x1 - x0, x3 - x2, HERMITE_MODE);
+    //y_val = generate_curve_coefs(y0, y2, y1 - y0, y3 - y2, HERMITE_MODE);
+    x_val = generate_curve_coefs(x0, x2, x1, x3, HERMITE_MODE);
+    y_val = generate_curve_coefs(y0, y2, y1, y3, HERMITE_MODE);
   }
+
   else if (type == BEZIER_MODE){ 
     x_val = generate_curve_coefs(x0, x1, x2, x3, BEZIER_MODE);
     y_val = generate_curve_coefs(y0, y1, y2, y3, BEZIER_MODE);
-
-    for(t = 0; t < 1; t += 1/step) {
-      add_edge(points, x_val->m[0][0]*t*t*t + x_val->m[1][0]*t*t + x_val->m[2][0]*t + x_val->m[3][0], y_val->m[0][0]*t*t*t + y_val->m[1][0]*t*t + y_val->m[2][0]*t + y_val->m[3][0], 0, x_val->m[0][0]*t*t*t + x_val->m[1][0]*t*t + x_val->m[2][0]*t + x_val->m[3][0], y_val->m[0][0]*t*t*t + y_val->m[1][0]*t*t + y_val->m[2][0]*t + y_val->m[3][0], 0);
-    }
-
   }
-}
 
+  /*for (t = 0; t < 1; t += 1.0/step) {
+    add_edge(points, x_val->m[0][0]*t*t*t + x_val->m[1][0]*t*t + x_val->m[2][0]*t + x_val->m[3][0], y_val->m[0][0]*t*t*t + y_val->m[1][0]*t*t + y_val->m[2][0]*t + y_val->m[3][0], 0, x_val->m[0][0]*t*t*t + x_val->m[1][0]*t*t + x_val->m[2][0]*t + x_val->m[3][0], y_val->m[0][0]*t*t*t + y_val->m[1][0]*t*t + y_val->m[2][0]*t + y_val->m[3][0], 0);
+  }*/
+
+  //I'm not really sure what my problem is because I use the same method here as I did before. 
+  //I think it might be that I just screwed up something with the multiplication (producing a typo-esque error)
+  //since I hadn't split the function into t(t(at+b)+c)+d format and I was doing it the long way instead
+  double px0 = x0;
+  double py0 = y0;
+  double px1 = x0;
+  double py1 = y0;
+  for(t = 0; t < 1; t += 1/step){
+    px1 = t * ( t * ( ( x_val->m[0][0] * t ) + x_val->m[1][0]) + x_val->m[2][0]) + x_val->m[3][0];
+    py1 = t * ( t * ( ( y_val->m[0][0] * t ) + y_val->m[1][0]) + y_val->m[2][0]) + y_val->m[3][0];
+    add_edge(points, px0, py0, 0, px1, py1, 0);
+    px0 = px1;
+    py0 = py1;
+  }
+  
+
+}
 
 /*======== void add_point() ==========
 Inputs:   struct matrix * points
